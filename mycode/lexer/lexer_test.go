@@ -6,14 +6,14 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
-	let ten = 10;
+	input := `让 five = 5;
+	让 ten = 10;
 	
-	let add = fn(x, y) {
+	让 add = fn(x, y) {
 	  x + y;
 	};
 	
-	let result = add(five, ten);
+	让 result = add(five, ten);
 	!-/*5;
 	5 < 10 > 5;
 
@@ -23,24 +23,23 @@ func TestNextToken(t *testing.T) {
 		return false;
 	}	
 	10 == 10;
-	10 != 9;
-	`
+	10 != 9;`
 
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.LET, "let"},
+		{token.LET, "让"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "让"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "让"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
 		{token.FUNCTION, "fn"},
@@ -56,7 +55,7 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "让"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
 		{token.IDENT, "add"},
@@ -109,6 +108,15 @@ func TestNextToken(t *testing.T) {
 	l := New(input)
 	for i, tt := range tests {
 		tok := l.NextToken()
+
+		print(tok.Literal)
+		print("\n")
+
+		// print("Literal Token: " + tok.Literal + "\n")
+
+		// if tok.Literal == "让" {
+		// 	print("Hell yeah")
+		// }
 
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - tokentype wrong. Expected=%q, got=%q",

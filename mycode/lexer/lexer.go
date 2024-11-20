@@ -1,12 +1,15 @@
 package lexer
 
-import "interpreter-project/token"
+import (
+	"interpreter-project/token"
+	"unicode"
+)
 
 type Lexer struct {
 	input        string
 	position     int
 	readPosition int
-	ch           byte
+	ch           rune
 }
 
 func New(input string) *Lexer {
@@ -16,20 +19,20 @@ func New(input string) *Lexer {
 }
 
 func (l *Lexer) readChar() {
-	if l.readPosition >= len(l.input) {
+	if l.readPosition >= len([]rune(l.input)) {
 		l.ch = 0
 	} else {
-		l.ch = l.input[l.readPosition]
+		l.ch = []rune(l.input)[l.readPosition]
 	}
 	l.position = l.readPosition
 	l.readPosition += 1
 }
 
-func (l *Lexer) peekChar() byte {
+func (l *Lexer) peekChar() rune {
 	if l.readPosition >= len(l.input) {
 		return 0
 	} else {
-		return l.input[l.readPosition]
+		return []rune(l.input)[l.readPosition]
 	}
 }
 
@@ -87,6 +90,9 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
+		} else if isChineseCharacter(l.ch) {
+			tok.Literal = l.readIdentifierChinese()
+			tok.Type = token.LookupIdent(tok.Literal)
 		} else if isDigit(l.ch) {
 			tok.Type = token.INT
 			tok.Literal = l.readNumber()
@@ -100,7 +106,7 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func newToken(tokenType token.TokenType, ch byte) token.Token {
+func newToken(tokenType token.TokenType, ch rune) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
@@ -109,10 +115,20 @@ func (l *Lexer) readIdentifier() string {
 	for isLetter(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return substring(l.input, position, l.position)
 }
-func isLetter(ch byte) bool {
+func (l *Lexer) readIdentifierChinese() string {
+	position := l.position
+	for isChineseCharacter(l.ch) {
+		l.readChar()
+	}
+	return substring(l.input, position, l.position)
+}
+func isLetter(ch rune) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+func isChineseCharacter(ch rune) bool {
+	return unicode.Is(unicode.Han, ch)
 }
 
 func (l *Lexer) skipWhitespace() {
@@ -126,9 +142,14 @@ func (l *Lexer) readNumber() string {
 	for isDigit(l.ch) {
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return substring(l.input, position, l.position)
 }
 
-func isDigit(ch byte) bool {
+func isDigit(ch rune) bool {
 	return '0' <= ch && ch <= '9'
+}
+
+func substring(s string, l int, r int) string {
+	runes := []rune(s)
+	return string(runes[l:r])
 }

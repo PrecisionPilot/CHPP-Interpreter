@@ -6,23 +6,23 @@ import (
 )
 
 type Lexer struct {
-	input        string
+	input        []rune
 	position     int
 	readPosition int
 	ch           rune
 }
 
 func New(input string) *Lexer {
-	l := &Lexer{input: input}
+	l := &Lexer{input: []rune(input)}
 	l.readChar()
 	return l
 }
 
 func (l *Lexer) readChar() {
-	if l.readPosition >= len([]rune(l.input)) {
+	if l.readPosition >= len(l.input) {
 		l.ch = 0
 	} else {
-		l.ch = []rune(l.input)[l.readPosition]
+		l.ch = l.input[l.readPosition]
 	}
 	l.position = l.readPosition
 	l.readPosition += 1
@@ -32,7 +32,7 @@ func (l *Lexer) peekChar() rune {
 	if l.readPosition >= len(l.input) {
 		return 0
 	} else {
-		return []rune(l.input)[l.readPosition]
+		return l.input[l.readPosition]
 	}
 }
 
@@ -115,14 +115,14 @@ func (l *Lexer) readIdentifier() string {
 	for isLetter(l.ch) {
 		l.readChar()
 	}
-	return substring(l.input, position, l.position)
+	return string(l.input[position:l.position])
 }
 func (l *Lexer) readIdentifierChinese() string {
 	position := l.position
 	for isChineseCharacter(l.ch) {
 		l.readChar()
 	}
-	return substring(l.input, position, l.position)
+	return string(l.input[position:l.position])
 }
 func isLetter(ch rune) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
@@ -142,14 +142,9 @@ func (l *Lexer) readNumber() string {
 	for isDigit(l.ch) {
 		l.readChar()
 	}
-	return substring(l.input, position, l.position)
+	return string(l.input[position:l.position])
 }
 
 func isDigit(ch rune) bool {
 	return '0' <= ch && ch <= '9'
-}
-
-func substring(s string, l int, r int) string {
-	runes := []rune(s)
-	return string(runes[l:r])
 }

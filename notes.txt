@@ -1,0 +1,12 @@
+Methods of Evaluation
+- Tree-walking Interpreter (evaluates and executes on the fly, recursive)
+- Converts AST to bytecode, or source code to bytecode directly, then uses VM for execution
+- Or the VM can compile bytecode to machine code and run it on the fly (JIT: just in time interpreter/compiler)
+
+Ruby
+- up to v1.8: tree-walking
+- from v1.9: parses source code into AST, then compiles into bytecode for VM execution
+
+Lua
+- Started w/ bytecode for VM execution
+- 12 years later LuaJIT was created whicch was 50 times faster

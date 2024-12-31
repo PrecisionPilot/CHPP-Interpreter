@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"interpreter-project/ast"
 	"interpreter-project/object"
 )
@@ -173,4 +174,10 @@ func isTruthy(obj object.Object) bool {
 	default:
 		return true
 	}
+}
+
+// Error
+
+func newError(format string, a ...interface{}) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }

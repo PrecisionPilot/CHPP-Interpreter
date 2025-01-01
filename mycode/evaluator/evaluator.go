@@ -268,7 +268,7 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 	if !ok {
 		return newError("not a function: %s", fn.Type())
 	}
-
+	// For scoping purposes, closure support
 	extendedEnv := extendFunctionEnv(function, args)
 	evaluated := Eval(function.Body, extendedEnv)
 	// Must be unwrapped otherwise evaluation stops completely

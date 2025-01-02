@@ -1,27 +1,10 @@
 package main
 
-type Car struct {
-	name string
-	mileage int
-}
-
-func (c Car) printName() {
-	print(c.name)
-}
-
-func (c Car) honk() {
-	print("pdiuaerui")
-}
-
-
-
 func main() {
-	s := "a对"
-	// runeArray := []rune(s)[5]
-	print(len(s))
+	runeArray := []rune("可以asdf")
+	// print(string(runeArray))
 
-
-	familyCar *int
-	somedudesCar Car
-	familyCar.printName()
+	for i := range len(runeArray) {
+		println(string(runeArray[i]))
+	}
 }

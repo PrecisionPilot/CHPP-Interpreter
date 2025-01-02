@@ -7,6 +7,7 @@ import (
 	"interpreter-project/lexer"
 	"interpreter-project/object"
 	"interpreter-project/parser"
+	"interpreter-project/token"
 	"io"
 )
 
@@ -50,6 +51,25 @@ func Start(in io.Reader, out io.Writer) {
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
+		}
+	}
+}
+
+func StartTokenRepl(in io.Reader, out io.Writer) {
+	scanner := bufio.NewScanner(in)
+
+	for {
+		fmt.Printf(PROMPT)
+		scanned := scanner.Scan()
+		if !scanned {
+			return
+		}
+
+		line := scanner.Text()
+		l := lexer.New(line)
+
+		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
+			fmt.Printf("%+v\n", tok)
 		}
 	}
 }

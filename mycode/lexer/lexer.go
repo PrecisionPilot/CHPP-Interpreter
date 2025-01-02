@@ -82,6 +82,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch)
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch)
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
@@ -96,6 +100,7 @@ func (l *Lexer) NextToken() token.Token {
 		} else if isChineseCharacter(l.ch) {
 			tok.Literal = l.readIdentifierChinese()
 			tok.Type = token.LookupIdent(tok.Literal)
+			return tok
 		} else if isDigit(l.ch) {
 			tok.Type = token.INT
 			tok.Literal = l.readNumber()

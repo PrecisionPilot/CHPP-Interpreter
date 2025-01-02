@@ -329,9 +329,22 @@ func TestBuiltinFunctions(t *testing.T) {
 	}{
 		{`长度("")`, 0},
 		{`长度("four")`, 4},
-		// {`长度("hello world")`, 11},
-		// {`长度(1)`, "argument to `长度` not supported, got INTEGER"},
-		// {`长度("one", "two")`, "wrong number of arguments. got=2, want=1"},
+		{`长度("hello world")`, 11},
+		{`长度(1)`, "argument to `长度` not supported, got INTEGER"},
+		{`长度("one", "two")`, "wrong number of arguments. got=2, want=1"},
+		{`长度([1, 2, 3])`, 3},
+		{`长度([])`, 0},
+		{`puts("hello", "world!")`, nil},
+		{`第一个([1, 2, 3])`, 1},
+		{`第一个([])`, nil},
+		{`第一个(1)`, "argument to `第一个` must be ARRAY, got INTEGER"},
+		{`最后个([1, 2, 3])`, 3},
+		{`最后个([])`, nil},
+		{`最后个(1)`, "argument to `最后个` must be ARRAY, got INTEGER"},
+		{`其余([1, 2, 3])`, []int{2, 3}},
+		{`其余([])`, nil},
+		{`附加([], 1)`, []int{1}},
+		{`附加(1, 1)`, "argument to `附加` must be ARRAY, got INTEGER"},
 	}
 
 	for _, tt := range tests {
@@ -340,15 +353,111 @@ func TestBuiltinFunctions(t *testing.T) {
 		switch expected := tt.expected.(type) {
 		case int:
 			testIntegerObject(t, evaluated, int64(expected))
+		case nil:
+			testNullObject(t, evaluated)
 		case string:
 			errObj, ok := evaluated.(*object.Error)
 			if !ok {
-				t.Errorf("object is not Error. got=%T (%+v)", evaluated, evaluated)
+				t.Errorf("object is not Error. got=%T (%+v)",
+					evaluated, evaluated)
 				continue
 			}
 			if errObj.Message != expected {
-				t.Errorf("wrong error message. expected=%q, got=%q", expected, errObj.Message)
+				t.Errorf("wrong error message. expected=%q, got=%q",
+					expected, errObj.Message)
 			}
+		case []int:
+			array, ok := evaluated.(*object.Array)
+			if !ok {
+				t.Errorf("obj not Array. got=%T (%+v)", evaluated, evaluated)
+				continue
+			}
+
+			if len(array.Elements) != len(expected) {
+				t.Errorf("wrong num of elements. want=%d, got=%d",
+					len(expected), len(array.Elements))
+				continue
+			}
+
+			for i, expectedElem := range expected {
+				testIntegerObject(t, array.Elements[i], int64(expectedElem))
+			}
+		}
+	}
+}
+
+func TestArrayLiterals(t *testing.T) {
+	input := "[1, 2 * 2, 3 + 3]"
+
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("object is not Array. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	if len(result.Elements) != 3 {
+		t.Fatalf("array has wrong num of elements. got=%d", len(result.Elements))
+	}
+
+	testIntegerObject(t, result.Elements[0], 1)
+	testIntegerObject(t, result.Elements[1], 4)
+	testIntegerObject(t, result.Elements[2], 6)
+}
+
+func TestArrayIndexExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			"[1, 2, 3][0]",
+			1,
+		},
+		{
+			"[1, 2, 3][1]",
+			2,
+		},
+		{
+			"[1, 2, 3][2]",
+			3,
+		},
+		{
+			"让 i = 0; [1][i];",
+			1,
+		},
+		{
+			"[1, 2, 3][1 + 1];",
+			3,
+		},
+		{
+			"让 myArray = [1, 2, 3]; myArray[2];",
+			3,
+		},
+		{
+			"让 myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];",
+			6,
+		},
+		{
+			"让 myArray = [1, 2, 3]; 让 i = myArray[0]; myArray[i]",
+			2,
+		},
+		{
+			"[1, 2, 3][3]",
+			nil,
+		},
+		{
+			"[1, 2, 3][-1]",
+			nil,
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
 		}
 	}
 }

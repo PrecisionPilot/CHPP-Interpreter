@@ -53,7 +53,7 @@ func Start(in io.Reader, out io.Writer) {
 		// 	io.WriteString(out, "\n")
 		// }
 
-		if evaluated.Type() == object.ERROR_OBJ {
+		if evaluated != nil && evaluated.Type() == object.ERROR_OBJ {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}

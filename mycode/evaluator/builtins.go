@@ -1,6 +1,9 @@
 package evaluator
 
-import "interpreter-project/object"
+import (
+	"fmt"
+	"interpreter-project/object"
+)
 
 var builtins = map[string]*object.Builtin{
 	"长度": &object.Builtin{
@@ -91,6 +94,15 @@ var builtins = map[string]*object.Builtin{
 			newElements[length] = args[1]
 
 			return &object.Array{Elements: newElements}
+		},
+	},
+	"显示": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+
+			return NULL
 		},
 	},
 }

@@ -338,8 +338,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`长度("one", "two")`, "wrong number of arguments. got=2, want=1"},
 		{`长度([1, 2, 3])`, 3},
 		{`长度([])`, 0},
-		// TODO:
-		// {`puts("hello", "world!")`, nil},
+		{`显示("hello", "world!")`, nil},
 		{`第一个([1, 2, 3])`, 1},
 		{`第一个([])`, nil},
 		{`第一个(1)`, "argument to `第一个` must be ARRAY, got INTEGER"},
@@ -521,7 +520,7 @@ func TestHashIndexExpressions(t *testing.T) {
 			nil,
 		},
 		{
-			`let key = "foo"; {"foo": 5}[key]`,
+			`让 key = "foo"; {"foo": 5}[key]`,
 			5,
 		},
 		{

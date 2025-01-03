@@ -127,9 +127,6 @@ func TestNextToken(t *testing.T) {
 	for i, tt := range tests {
 		tok := l.NextToken()
 
-		print(tok.Literal)
-		print("\n")
-
 		// print("Literal Token: " + tok.Literal + "\n")
 
 		// if tok.Literal == "让" {

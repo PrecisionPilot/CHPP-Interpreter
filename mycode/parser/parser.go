@@ -186,6 +186,7 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+// ----- Parse Expression -----
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	// Check if p.curToken.Type has a parsing function
 	prefix := p.prefixParseFns[p.curToken.Type]

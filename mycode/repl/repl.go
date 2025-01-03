@@ -48,7 +48,12 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil {
+		// if evaluated != nil && evaluated != evaluator.NULL {
+		// 	io.WriteString(out, evaluated.Inspect())
+		// 	io.WriteString(out, "\n")
+		// }
+
+		if evaluated.Type() == object.ERROR_OBJ {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}

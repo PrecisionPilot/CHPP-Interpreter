@@ -40,8 +40,8 @@ func TestEvalBooleanExpression(t *testing.T) {
 		input    string
 		expected bool
 	}{
-		{"true", true},
-		{"false", false},
+		{"对", true},
+		{"不对", false},
 		{"1 < 2", true},
 		{"1 > 2", false},
 		{"1 < 1", false},
@@ -50,15 +50,15 @@ func TestEvalBooleanExpression(t *testing.T) {
 		{"1 != 1", false},
 		{"1 == 2", false},
 		{"1 != 2", true},
-		{"true == true", true},
-		{"false == false", true},
-		{"true == false", false},
-		{"true != false", true},
-		{"false != true", true},
-		{"(1 < 2) == true", true},
-		{"(1 < 2) == false", false},
-		{"(1 > 2) == true", false},
-		{"(1 > 2) == false", true},
+		{"对 == 对", true},
+		{"不对 == 不对", true},
+		{"对 == 不对", false},
+		{"对 != 不对", true},
+		{"不对 != 对", true},
+		{"(1 < 2) == 对", true},
+		{"(1 < 2) == 不对", false},
+		{"(1 > 2) == 对", false},
+		{"(1 > 2) == 不对", true},
 	}
 
 	for _, tt := range tests {
@@ -100,11 +100,11 @@ func TestBangOperator(t *testing.T) {
 		input    string
 		expected bool
 	}{
-		{"!true", false},
-		{"!false", true},
+		{"!对", false},
+		{"!不对", true},
 		{"!5", false},
-		{"!!true", true},
-		{"!!false", false},
+		{"!!对", true},
+		{"!!不对", false},
 		{"!!5", true},
 	}
 
@@ -119,13 +119,13 @@ func TestIfElseExpressions(t *testing.T) {
 		input    string
 		expected interface{}
 	}{
-		{"if (true) { 10 }", 10},
-		{"if (false) { 10 }", nil},
-		{"if (1) { 10 }", 10},
-		{"if (1 < 2) { 10 }", 10},
-		{"if (1 > 2) { 10 }", nil},
-		{"if (1 > 2) { 10 } else { 20 }", 20},
-		{"if (1 < 2) { 10 } else { 20 }", 10},
+		{"如果 (对) { 10 }", 10},
+		{"如果 (不对) { 10 }", nil},
+		{"如果 (1) { 10 }", 10},
+		{"如果 (1 < 2) { 10 }", 10},
+		{"如果 (1 > 2) { 10 }", nil},
+		{"如果 (1 > 2) { 10 } 否则 { 20 }", 20},
+		{"如果 (1 < 2) { 10 } 否则 { 20 }", 10},
 	}
 
 	for _, tt := range tests {
@@ -144,27 +144,27 @@ func TestReturnStatements(t *testing.T) {
 		input    string
 		expected int64
 	}{
-		{"return 10;", 10},
-		{"return 10; 9;", 10},
-		{"return 2 * 5; 9;", 10},
-		{"9; return 2 * 5; 9;", 10},
-		{"if (10 > 1) { return 10; }", 10},
+		{"退还 10;", 10},
+		{"退还 10; 9;", 10},
+		{"退还 2 * 5; 9;", 10},
+		{"9; 退还 2 * 5; 9;", 10},
+		{"如果 (10 > 1) { 退还 10; }", 10},
 		{
 			`
-if (10 > 1) {
-  if (10 > 1) {
-    return 10;
+如果 (10 > 1) {
+  如果 (10 > 1) {
+    退还 10;
   }
 
-  return 1;
+  退还 1;
 }
 `,
 			10,
 		},
 		{
 			`
-让 f = fn(x) {
-  return x;
+让 f = 函数(x) {
+  退还 x;
   x + 10;
 };
 f(10);`,
@@ -172,10 +172,10 @@ f(10);`,
 		},
 		{
 			`
-让 f = fn(x) {
+让 f = 函数(x) {
    让 result = x + 10;
-   return result;
-   return 10;
+   退还 result;
+   退还 10;
 };
 f(10);`,
 			20,
@@ -194,36 +194,36 @@ func TestErrorHandling(t *testing.T) {
 		expectedMessage string
 	}{
 		{
-			"5 + true;",
+			"5 + 对;",
 			"type mismatch: INTEGER + BOOLEAN",
 		},
 		{
-			"5 + true; 5;",
+			"5 + 对; 5;",
 			"type mismatch: INTEGER + BOOLEAN",
 		},
 		{
-			"-true",
+			"-对",
 			"unknown operator: -BOOLEAN",
 		},
 		{
-			"true + false;",
+			"对 + 不对;",
 			"unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
-			"5; true + false; 5",
+			"5; 对 + 不对; 5",
 			"unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
-			"if (10 > 1) { true + false; }",
+			"如果 (10 > 1) { 对 + 不对; }",
 			"unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
 			`
-			if (10 > 1) {
- if (10 > 1) {
- return true + false;
+			如果 (10 > 1) {
+ 如果 (10 > 1) {
+ 退还 对 + 不对;
  }
- return 1;
+ 退还 1;
  }
 			`, "unknown operator: BOOLEAN + BOOLEAN",
 		},
@@ -236,7 +236,7 @@ func TestErrorHandling(t *testing.T) {
 			"unknown operator: STRING - STRING",
 		},
 		{
-			`{"name": "Monkey"}[fn(x) { x }];`,
+			`{"name": "Monkey"}[函数(x) { x }];`,
 			"unusable as hash key: FUNCTION",
 		},
 	}
@@ -273,7 +273,7 @@ func TestLetStatements(t *testing.T) {
 }
 
 func TestFunctionObject(t *testing.T) {
-	input := "fn(x) { x + 2; };"
+	input := "函数(x) { x + 2; };"
 
 	evaluated := testEval(input)
 	fn, ok := evaluated.(*object.Function)
@@ -301,12 +301,12 @@ func TestFunctionApplicaiton(t *testing.T) {
 		input    string
 		expected int64
 	}{
-		{"让 identity = fn(x) { x; }; identity(5);", 5},
-		{"让 identity = fn(x) { return x; }; identity(5);", 5},
-		{"让 double = fn(x) { x * 2; }; double(5);", 10},
-		{"让 add = fn(x, y) { x + y; }; add(5, 5);", 10},
-		{"让 add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
-		{"fn(x) { x; }(5)", 5},
+		{"让 identity = 函数(x) { x; }; identity(5);", 5},
+		{"让 identity = 函数(x) { 退还 x; }; identity(5);", 5},
+		{"让 double = 函数(x) { x * 2; }; double(5);", 10},
+		{"让 add = 函数(x, y) { x + y; }; add(5, 5);", 10},
+		{"让 add = 函数(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+		{"函数(x) { x; }(5)", 5},
 	}
 
 	for _, tt := range tests {
@@ -316,8 +316,8 @@ func TestFunctionApplicaiton(t *testing.T) {
 
 func TestClosures(t *testing.T) {
 	input := `
-	让 newAdder = fn(x) {
-		fn(y) {x + y};
+	让 newAdder = 函数(x) {
+		函数(y) {x + y};
 	};
 
 	让 addTwo = newAdder(2);
@@ -473,8 +473,8 @@ func TestHashLiterals(t *testing.T) {
 	two: 1 + 1,
 	"thr" + "ee": 6 / 2,
 	4: 4,
-	true: 5,
-	false: 6
+	对: 5,
+	不对: 6
 	}`
 
 	evaluated := testEval(input)
@@ -532,11 +532,11 @@ func TestHashIndexExpressions(t *testing.T) {
 			5,
 		},
 		{
-			`{true: 5}[true]`,
+			`{对: 5}[对]`,
 			5,
 		},
 		{
-			`{false: 5}[false]`,
+			`{不对: 5}[不对]`,
 			5,
 		},
 	}

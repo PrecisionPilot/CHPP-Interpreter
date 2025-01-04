@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var debugTokens = false
+var debugTokens = true
 
 const (
 	_ int = iota

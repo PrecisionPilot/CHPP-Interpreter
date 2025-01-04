@@ -91,6 +91,35 @@ func (l *Lexer) NextToken() token.Token {
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
+
+	// Chinese symbols
+	case '；':
+		tok = newToken(token.SEMICOLON, ';')
+	case '：':
+		tok = newToken(token.COLON, ':')
+	case '（':
+		tok = newToken(token.LPAREN, '(')
+	case '）':
+		tok = newToken(token.RPAREN, ')')
+	case '，':
+		tok = newToken(token.COMMA, ',')
+	case '【':
+		tok = newToken(token.LBRACKET, '[')
+	case '】':
+		tok = newToken(token.RBRACKET, ']')
+	case '“':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
+	case '”':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
+	case '！':
+		if l.peekChar() == '=' {
+			l.readChar()
+			tok = token.Token{Type: token.NOT_EQ, Literal: "！" + string(l.ch)}
+		} else {
+			tok = newToken(token.BANG, l.ch)
+		}
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -159,7 +188,7 @@ func (l *Lexer) readString() string {
 	position := l.position + 1
 	for {
 		l.readChar()
-		if l.ch == '"' || l.ch == 0 {
+		if l.ch == '"' || l.ch == '“' || l.ch == '”' || l.ch == 0 {
 			break
 		}
 	}

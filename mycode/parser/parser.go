@@ -8,6 +8,8 @@ import (
 	"strconv"
 )
 
+var debugTokens = false
+
 const (
 	_ int = iota
 	LOWEST
@@ -103,6 +105,9 @@ func (p *Parser) peekError(t token.TokenType) {
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+	if debugTokens {
+		fmt.Printf("%+v\n", p.curToken)
+	}
 }
 
 func (p *Parser) ParseProgram() *ast.Program {

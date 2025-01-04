@@ -7,13 +7,13 @@ type Token struct {
 }
 
 var keywords = map[string]TokenType{
-	"fn":     FUNCTION,
-	"让":      LET,
-	"true":   TRUE,
-	"false":  FALSE,
-	"if":     IF,
-	"else":   ELSE,
-	"return": RETURN,
+	"函数": FUNCTION,
+	"让":  LET,
+	"对":  TRUE,
+	"不对": FALSE,
+	"如果": IF,
+	"否则": ELSE,
+	"退还": RETURN,
 }
 
 func LookupIdent(ident string) TokenType {

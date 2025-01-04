@@ -137,7 +137,9 @@ func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
 		return false
 	}
 
-	if bo.TokenLiteral() != fmt.Sprintf("%t", value) {
+	englishToChineseBoolMap := map[bool]string{true: "对", false: "不对"}
+
+	if bo.TokenLiteral() != englishToChineseBoolMap[value] {
 		t.Errorf("bo.TokenLiteral not %t. got=%s", value, bo.TokenLiteral())
 		return false
 	}
@@ -153,8 +155,8 @@ func TestLetStatements(t *testing.T) {
 		expectedValue      interface{}
 	}{
 		{"让 x = 5;", "x", 5},
-		{"让 y = true;", "y", true},
-		{"让 foobar = y;", "foobar", "y"},
+		{"让 y = 对;", "y", true},
+		{"让 啊 = y;", "啊", "y"},
 	}
 
 	for _, tt := range tests {
@@ -181,9 +183,9 @@ func TestLetStatements(t *testing.T) {
 
 func TestReturnStatement(t *testing.T) {
 	input := `
-	return 5;
-	return 10;
-	return 993322;
+	退还 5;
+	退还 10;
+	退还 993322;
 	`
 
 	l := lexer.New(input)
@@ -203,14 +205,14 @@ func TestReturnStatement(t *testing.T) {
 			t.Errorf("stmt not *ast.returnStatement. got=%T", stmt)
 			continue
 		}
-		if returnStmt.TokenLiteral() != "return" {
-			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
+		if returnStmt.TokenLiteral() != "退还" {
+			t.Errorf("returnStmt.TokenLiteral not '退还', got %q", returnStmt.TokenLiteral())
 		}
 	}
 }
 
 func TestIdentifierExpression(t *testing.T) {
-	input := "foobar;"
+	input := "什么鬼;"
 
 	l := lexer.New(input)
 	p := New(l)
@@ -229,11 +231,11 @@ func TestIdentifierExpression(t *testing.T) {
 	if !ok {
 		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
 	}
-	if ident.Value != "foobar" {
-		t.Errorf("ident.Value not %s. got=%s", "foobar", ident.Value)
+	if ident.Value != "什么鬼" {
+		t.Errorf("ident.Value not %s. got=%s", "什么鬼", ident.Value)
 	}
-	if ident.TokenLiteral() != "foobar" {
-		t.Errorf("ident.TokenLiteral not %s. got=%s", "foobar", ident.TokenLiteral())
+	if ident.TokenLiteral() != "什么鬼" {
+		t.Errorf("ident.TokenLiteral not %s. got=%s", "什么鬼", ident.TokenLiteral())
 	}
 }
 
@@ -267,7 +269,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 }
 
 func TestStringLiteralExpression(t *testing.T) {
-	input := `"hello world";`
+	input := `"hello 世界";`
 
 	l := lexer.New(input)
 	p := New(l)
@@ -280,8 +282,8 @@ func TestStringLiteralExpression(t *testing.T) {
 		t.Fatalf("exp not *ast.StringLiteral. got=%T", stmt.Expression)
 	}
 
-	if literal.Value != "hello world" {
-		t.Errorf("literal.Value not %q. got=%q", "hello world", literal.Value)
+	if literal.Value != "hello 世界" {
+		t.Errorf("literal.Value not %q. got=%q", "世界", literal.Value)
 	}
 }
 
@@ -293,8 +295,8 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	}{
 		{"!5;", "!", 5},
 		{"-15;", "-", 15},
-		{"!true;", "!", true},
-		{"!false;", "!", false},
+		{"!对;", "!", true},
+		{"!不对;", "!", false},
 	}
 
 	for _, tt := range prefixTests {
@@ -340,9 +342,9 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"5 < 5;", 5, "<", 5},
 		{"5 == 5;", 5, "==", 5},
 		{"5 != 5;", 5, "!=", 5},
-		{"true == true", true, "==", true},
-		{"true != false", true, "!=", false},
-		{"false == false", false, "==", false},
+		{"对 == 对", true, "==", true},
+		{"对 != 不对", true, "!=", false},
+		{"不对 == 不对", false, "==", false},
 	}
 
 	for _, tt := range infixTests {
@@ -437,20 +439,20 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
 		},
 		{
-			"true",
-			"true",
+			"对",
+			"对",
 		},
 		{
-			"false",
-			"false",
+			"不对",
+			"不对",
 		},
 		{
-			"3 > 5 == false",
-			"((3 > 5) == false)",
+			"3 > 5 == 不对",
+			"((3 > 5) == 不对)",
 		},
 		{
-			"3 < 5 == true",
-			"((3 < 5) == true)",
+			"3 < 5 == 对",
+			"((3 < 5) == 对)",
 		},
 		{
 			"1 + (2 + 3) + 4",
@@ -504,7 +506,7 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 }
 
 func TestBooleanExpression(t *testing.T) {
-	input := "true;"
+	input := "对;"
 
 	l := lexer.New(input)
 	p := New(l)
@@ -526,13 +528,13 @@ func TestBooleanExpression(t *testing.T) {
 	if b.Value != true {
 		t.Errorf("ident.Value not %t. got=%t", true, b.Value)
 	}
-	if b.TokenLiteral() != "true" {
-		t.Errorf("ident.TokenLiteral not %s. got=%s", "true", b.TokenLiteral())
+	if b.TokenLiteral() != "对" {
+		t.Errorf("ident.TokenLiteral not %s. got=%s", "对", b.TokenLiteral())
 	}
 }
 
 func TestIfExpression(t *testing.T) {
-	input := `if (x < y) { x }`
+	input := `如果 (x < y) { x }`
 
 	l := lexer.New(input)
 	p := New(l)
@@ -576,7 +578,7 @@ func TestIfExpression(t *testing.T) {
 }
 
 func TestIfElseExpression(t *testing.T) {
-	input := `if (x < y) { x } else { y }`
+	input := `如果 (x < y) { x } 否则 { y }`
 
 	l := lexer.New(input)
 	p := New(l)
@@ -635,7 +637,7 @@ func TestIfElseExpression(t *testing.T) {
 }
 
 func TestFunctionLiteralParsing(t *testing.T) {
-	input := `fn(x, y) { x + y; }`
+	input := `函数(x, y) { x + y; }`
 	l := lexer.New(input)
 	p := New(l)
 	program := p.ParseProgram()
@@ -679,9 +681,9 @@ func TestFunctionParameterParsing(t *testing.T) {
 		input          string
 		expectedParams []string
 	}{
-		{input: "fn() {};", expectedParams: []string{}},
-		{input: "fn(x) {};", expectedParams: []string{"x"}},
-		{input: "fn(x, y, z) {};", expectedParams: []string{"x", "y", "z"}},
+		{input: "函数() {};", expectedParams: []string{}},
+		{input: "函数(x) {};", expectedParams: []string{"x"}},
+		{input: "函数(x, y, z) {};", expectedParams: []string{"x", "y", "z"}},
 	}
 
 	for _, tt := range tests {
@@ -839,7 +841,7 @@ func TestParsingIndexExpressions(t *testing.T) {
 }
 
 func TestParsingHashLiteralStringKeys(t *testing.T) {
-	input := `{"one": 1, "two": 2, "three": 3}`
+	input := `{"一": 1, "二": 2, "三": 3}`
 
 	l := lexer.New(input)
 	p := New(l)
@@ -857,9 +859,9 @@ func TestParsingHashLiteralStringKeys(t *testing.T) {
 	}
 
 	expected := map[string]int64{
-		"one":   1,
-		"two":   2,
-		"three": 3,
+		"一": 1,
+		"二": 2,
+		"三": 3,
 	}
 
 	for key, value := range hash.Pairs {

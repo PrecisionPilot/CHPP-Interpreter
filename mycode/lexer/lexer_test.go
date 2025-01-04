@@ -9,7 +9,7 @@ func TestNextToken(t *testing.T) {
 	input := `让 five = 5;
 	让 ten = 10;
 	
-	让 add = fn(x, y) {
+	让 add = 函数(x, y) {
 	  x + y;
 	};
 	
@@ -17,10 +17,10 @@ func TestNextToken(t *testing.T) {
 	!-/*5;
 	5 < 10 > 5;
 
-	if (5 < 10) {
-		return true;
-	} else {
-		return false;
+	如果 (5 < 10) {
+		退还 对;
+	} 否则 {
+		退还 不对;
 	}	
 	10 == 10;
 	10 != 9;
@@ -47,7 +47,7 @@ func TestNextToken(t *testing.T) {
 		{token.LET, "让"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
-		{token.FUNCTION, "fn"},
+		{token.FUNCTION, "函数"},
 		{token.LPAREN, "("},
 		{token.IDENT, "x"},
 		{token.COMMA, ","},
@@ -82,21 +82,21 @@ func TestNextToken(t *testing.T) {
 		{token.GT, ">"},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.IF, "if"},
+		{token.IF, "如果"},
 		{token.LPAREN, "("},
 		{token.INT, "5"},
 		{token.LT, "<"},
 		{token.INT, "10"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
-		{token.TRUE, "true"},
+		{token.RETURN, "退还"},
+		{token.TRUE, "对"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
-		{token.ELSE, "else"},
+		{token.ELSE, "否则"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
-		{token.FALSE, "false"},
+		{token.RETURN, "退还"},
+		{token.FALSE, "不对"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.INT, "10"},

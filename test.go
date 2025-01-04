@@ -1,10 +1,5 @@
 package main
 
 func main() {
-	runeArray := []rune("可以asdf")
-	// print(string(runeArray))
-
-	for i := range len(runeArray) {
-		println(string(runeArray[i]))
-	}
+	print(map[bool]string{true: "对", false: "不对"}[false])
 }

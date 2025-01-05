@@ -1,3 +1,10 @@
+Methods of Parsing
+- Top-down (beginner friendly)
+    - Recursive descent parsing AKA Pratt parser by Vaughan Pratt (this interpreter)
+    - Early parsing
+    - Predictive parsing
+- Bottom-up
+
 Methods of Evaluation
 - Tree-walking Interpreter (evaluates and executes on the fly, recursive)
 - Converts AST to bytecode, or source code to bytecode directly, then uses VM for execution

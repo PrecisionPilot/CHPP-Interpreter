@@ -4,11 +4,17 @@ Tired of programming in plain old English? Look no further than the all mighty n
 
 ### Keywords
 `函数` - function
+
 `让`   - let
+
 `对`   - true
+
 `不对` - false
+
 `如果` - if
+
 `否则` - else
+
 `退还` - return
 
 ### Builtin functions
